@@ -15,7 +15,7 @@ if (isset($_SESSION["login"])) {
 $error = false;
 
 if (isset($_POST["login"])) {
-    $loginInput = mysqli_real_escape_string($db_conn, $_POST["login"]);
+    $loginInput = mysqli_real_escape_string($db_conn, $_POST["username_gmail"]);
     $password = $_POST["password"];
     $role = $_POST["role"];
 
@@ -30,10 +30,10 @@ if (isset($_POST["login"])) {
             $_SESSION["role"] = $row["role"];
 
             if ($row["role"] === "Admin") {
-                header("Location: admin/DashboardAdmin.php");
+                header("Location:admin/DashboardAdmin.php");
                 exit;
             } else {
-                header("Location: DashboardPelanggan.php");
+                header("Location:DashboardPelanggan.php");
                 exit;
             }
         } else {
@@ -68,7 +68,7 @@ if (isset($_POST["login"])) {
             <form action="" method="POST">
               <div class="mb-3">
                 <label for="login" class="form-label">Username / Gmail</label>
-                <input type="text" id="login" name="login" class="form-control" required />
+                <input type="text" id="login" name="username_gmail" class="form-control" required />
               </div>
               <div class="mb-3">
                 <label for="password" class="form-label">Kata Sandi</label>
