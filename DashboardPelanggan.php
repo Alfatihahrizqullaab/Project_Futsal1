@@ -6,8 +6,6 @@ if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Pelanggan") {
 }
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
