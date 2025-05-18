@@ -1,3 +1,16 @@
+<?php
+require "koneksi.php";
+
+if(isset($_POST["register"])){
+  if(register($_POST) > 0){
+    echo "<script>alert('User baru berhasil ditambahkan!')</script>";
+  }else{
+    echo mysqli_error($db_conn);
+  }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -57,7 +70,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Gmail</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="gmail" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Kata Sandi</label>
@@ -65,17 +78,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Nomor HP</label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+                        <input type="text" class="form-control" id="phone" name="no_hp" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Daftar Sebagai</label>
                         <select name="role" class="form-select" required>
                         <option value="" selected disabled>Pilih Peran</option>
-                        <option value="pelanggan">Pelanggan</option>
-                        <option value="penyedia">Admin Penyedia Lapangan</option>
+                        <option value="Pelanggan">Pelanggan</option>
+                        <option value="Admin">Admin Penyedia Lapangan</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Daftar</button>
+                    <button type="submit" class="btn btn-primary w-100" name="register">Daftar</button>
                     </form>
                 </div>
                 <div class="card-footer text-center">
