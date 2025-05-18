@@ -1,42 +1,43 @@
 <?php
+require_once 'koneksi.php';
 
-function register($data){
+function register($data) {
     global $db_conn;
-    $username = strtolower($data["username"]);
-    $gmail = strtolower($data["gmail"]);
-    $password = mysqli_real_escape_string($db_conn,$data["password"]);
+
+    $username = strtolower(trim($data["username"]));
+    $gmail = strtolower(trim($data["gmail"]));
+    $password_hash = $data["password"];
     $no_hp = trim($data["no_hp"]);
     $role = $data["role"];
 
-    $result = mysqli_query($db_conn, "SELECT username FROM user WHERE username = '$username' ");
-
-    if(mysqli_fetch_row($result)){
-        echo "<script>
-            alert('username sudah terdaftar!');
-        </script>";
+    // Cek username sudah ada atau belum
+    $cekUser = mysqli_query($db_conn, "SELECT username FROM user WHERE username = '$username'");
+    if (mysqli_num_rows($cekUser) > 0) {
+        echo "<script>alert('Username sudah terdaftar!');</script>";
         return false;
     }
 
+    // Validasi nomor HP
     if (!preg_match("/^[0-9]{10,15}$/", $no_hp)) {
-        echo "<script>
-            alert(Nomor HP harus angka (10-15 digit.))
-        </script>";
+        echo "<script>alert('Nomor HP harus angka dan 10-15 digit!');</script>";
         return false;
-    
     }
 
+    // Validasi role
     if ($role !== 'Pelanggan' && $role !== 'Admin') {
-        echo "<script>
-            alert(Role tidak valid.)
-        </script>";
+        echo "<script>alert('Role tidak valid!');</script>";
         return false;
     }
 
-    $password = password_hash($password, PASSWORD_DEFAULT);
+    // Hash password
+    $password_hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    mysqli_query($db_conn,"INSERT INTO user VALUES('','$username','$gmail','$password','$no_hp','$role')");
+
+    // Insert user
+    $query = "INSERT INTO user (username, gmail, password, no_hp, role)
+              VALUES ('$username', '$gmail', '$password_hash', '$no_hp', '$role')";
+    mysqli_query($db_conn, $query);
 
     return mysqli_affected_rows($db_conn);
-
 }
 ?>
