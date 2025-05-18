@@ -1,13 +1,15 @@
 <?php
-require "koneksi.php";
+require_once 'koneksi.php'; // ini membuat $db_conn tersedia di global scope
+require_once 'proses-register.php'; // file yang memuat fungsi register()
 
-if(isset($_POST["register"])){
-  if(register($_POST) > 0){
-    echo "<script>alert('User baru berhasil ditambahkan!')</script>";
-  }else{
-    echo mysqli_error($db_conn);
-  }
+if (isset($_POST['register'])) {
+    if (register($_POST) > 0) {
+        echo "<script>alert('User baru berhasil ditambahkan!')</script>";
+    } else {
+        echo mysqli_error($db_conn);
+    }
 }
+
 
 ?>
 

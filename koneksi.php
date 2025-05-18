@@ -1,9 +1,8 @@
 <?php
 
-$db_conn = mysqli_connect("localhost","root","","db_futsal");
+$db_conn = mysqli_connect("localhost", "root", "", "db_futsal");
 
-if($conn -> connect_error){
-    echo "Failed to connect to MySQL:" . $conn -> connect_error;
-    exit();
+if (!$db_conn) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
 }
 ?>

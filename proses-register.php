@@ -1,7 +1,7 @@
 <?php
 
 function register($data){
-    $db_conn = include("koneksi.php");
+    global $db_conn;
     $username = strtolower($data["username"]);
     $gmail = strtolower($data["gmail"]);
     $password = mysqli_real_escape_string($db_conn,$data["password"]);
