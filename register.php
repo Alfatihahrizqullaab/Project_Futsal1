@@ -1,5 +1,16 @@
 <?php
+
+session_start();
+if (isset($_SESSION["login"])) {
+    // Logout dulu jika masih login
+    session_unset();
+    session_destroy();
+    // Redirect kembali ke register agar bersih
+    header("Location: register.php");
+    exit;
+}
 require_once 'proses-register.php';
+
 
 if (isset($_POST['register'])) {
     if (register($_POST) > 0) {

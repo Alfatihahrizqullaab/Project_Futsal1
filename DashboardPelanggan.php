@@ -65,11 +65,14 @@ if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Pelanggan") {
             </li>
           </ul>
           <div class="mt-3 mt-lg-0 ms-lg-3">
-            <a href="login.html" class="btn btn-primary fw-bold">Login</a>
+            <?php if (isset($_SESSION['login']) && $_SESSION['role'] === 'Pelanggan'): ?>
+              <a href="logout.php" class="btn btn-danger fw-bold">Logout</a>
+            <?php else: ?>
+              <a href="login.php" class="btn btn-primary fw-bold">Login</a>
+              <a href="register.php" class="btn btn-primary fw-bold">Daftar</a>
+            <?php endif; ?>
           </div>
-          <div class="mt-3 mt-lg-0 ms-lg-3">
-            <a href="register.html" class="btn btn-primary fw-bold">Daftar</a>
-          </div>
+
         </div>
       </div>
     </div>
