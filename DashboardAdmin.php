@@ -1,9 +1,18 @@
 <?php
 session_start();
-if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Admin") {
-    header("Location: ../login.php");
+include "koneksi.php";
+
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== "Admin") {
+    header("Location: login.php");
     exit;
 }
+
+$nama = $_SESSION['nama'];
+$id_pengelola = $_SESSION['id_pengelola'];
+
+// Cek apakah sudah punya tempat futsal
+$cek_tempat = mysqli_query($db_conn, "SELECT * FROM TempatFutsal WHERE id_pengelola = $id_pengelola");
+$punya_tempat = mysqli_num_rows($cek_tempat) > 0;
 ?>
 
 <!DOCTYPE html>
@@ -17,10 +26,13 @@ if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Admin") {
 
 </head>
 <style>
-  .form-check-input:checked {
-    background-color: #198754;
-    border-color: #198754;
-  }
+    body {
+      padding-top: 70px; /* Sesuaikan dengan tinggi navbar */
+    }
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
 </style>
 <body>
   <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top shadow-sm mb-4">
@@ -52,14 +64,11 @@ if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Admin") {
                         <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route("admin.keuangan")}}">Keuangan</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="#">Tambah Event</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#">Tambah Lapangan</a>
-                  </li>
+                      <a class="nav-link" href="Lapangan.php">Tambah Lapangan</a>
+                    </li>
                   <div class="mt-3 mt-lg-0 ms-lg-3">
                     <?php if (isset($_SESSION['login']) && $_SESSION['role'] === 'Admin'): ?>
                       <a href="logout.php" class="btn btn-danger fw-bold">Logout</a>
@@ -73,55 +82,52 @@ if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Admin") {
     </div>
 </nav>
 
-<!-- Konten -->
-<div class="container mt-5 pt-5">
-  <div class="text-center mb-4">
-    <h3>Status Operasional Lapangan</h3>
-    <p class="text-muted">Geser tombol untuk membuka atau menutup pemesanan lapangan.</p>
-  </div>
-
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-sm">
-        <div class="card-body text-center">
-          <h5 class="card-title mb-3">Lapangan Futsal Utama</h5>
-          <div class="d-flex flex-column align-items-center">
-            <!-- Switch Besar -->
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="statusToggle" onchange="toggleStatus()" style="width: 3.5rem; height: 2rem;">
+<div class="container mt-5">
+    <?php if (!$punya_tempat): ?>
+        <a href="tambahkanTempatFutsal.php" class="btn btn-success mb-4">+ Tambah Tempat</a>
+    <?php else: ?>
+        <div class="alert alert-info">Anda sudah menambahkan 1 tempat futsal. Tidak bisa menambahkan lagi.</div>
+    <?php endif; ?>
+    <div class="row g-4">
+        <?php
+        $result = mysqli_query($db_conn, "SELECT * FROM TempatFutsal");
+        while ($row = mysqli_fetch_assoc($result)) {
+            $isChecked = $row['statusTempatLapangan'] == 'Tersedia' ? 'checked' : '';
+            $labelId = "statusLabel" . $row['id_tempat'];
+            $switchId = "switch" . $row['id_tempat'];
+        ?>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <img src="<?= $row['gambar'] ?>" class="card-img-top" alt="<?= $row['nama_tempat'] ?>">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><?= $row['nama_tempat'] ?></h5>
+                    <p class="card-text"><?= $row['alamat'] ?></p>
+                    <p class="card-text">Jumlah Lapangan: <?= $row['Jumlah_Lapangan'] ?></p>
+                    <div class="form-check form-switch mt-auto">
+                        <input class="form-check-input" type="checkbox" id="<?= $switchId ?>" <?= $isChecked ?> 
+                            onchange="toggleStatus(this, <?= $row['id_tempat'] ?>)">
+                        <label class="form-check-label" for="<?= $switchId ?>" id="<?= $labelId ?>">
+                            <?= $row['statusTempatLapangan'] ?>
+                        </label>
+                    </div>
+                    <a href="proses-hapusTempat.php?id=<?= $row['id_tempat'] ?>" class="btn btn-sm btn-danger mt-3" onclick="return confirm('Yakin ingin menghapus tempat ini?')">Hapus</a>
+                </div>
             </div>
-            <!-- Status Info -->
-            <div id="statusLabel" class="status-box text-danger fw-bold mt-3" style="font-size: 1.3rem;">Lapangan Tutup</div>
-          </div>
         </div>
-      </div>
+        <?php } ?>
     </div>
-  </div>
 </div>
 
-<!-- Script Toggle -->
 <script>
-  function toggleStatus() {
-    const toggle = document.getElementById("statusToggle");
-    const label = document.getElementById("statusLabel");
+function toggleStatus(checkbox, id) {
+    const newStatus = checkbox.checked ? "Tersedia" : "Tidak Tersedia";
+    const label = document.getElementById("statusLabel" + id);
+    label.textContent = newStatus;
 
-    if (toggle.checked) {
-      label.innerHTML = "Lapangan Buka - Siap Terima Pemesanan";
-      label.classList.remove("text-danger");
-      label.classList.add("text-success");
-    } else {
-      label.innerHTML = "Lapangan Tutup";
-      label.classList.remove("text-success");
-      label.classList.add("text-danger");
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    toggleStatus();
-  });
+    // Redirect ke PHP handler
+    window.location.href = `proses-updateStatus.php?id=${id}&status=${newStatus}`;
+}
 </script>
-
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

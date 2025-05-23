@@ -1,10 +1,13 @@
 <?php
 session_start();
-if (!isset($_SESSION["login"]) || $_SESSION["role"] !== "Pelanggan") {
+if (!isset($_SESSION['login']) || $_SESSION['role'] !== "Pelanggan") {
     header("Location: login.php");
     exit;
 }
+
+$nama = $_SESSION['nama'];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
